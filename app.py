@@ -2,12 +2,26 @@ import joblib
 import pandas as pd
 import streamlit as st
 
-# Load the model and feature list
-model, features_used = joblib.load('linear_model.pkl')
+# Load the model only (not a tuple)
+model = joblib.load('linear_model.pkl')
+
+# Define the features used during model training
+features_used = [
+    'trip_distance',
+    'fare_amount',
+    'extra',
+    'mta_tax',
+    'tip_amount',
+    'tolls_amount',
+    'improvement_surcharge',
+    'congestion_surcharge',
+    'trip_duration',
+    'passenger_count'
+]
 
 # UI
 st.title("NYC Green Taxi Fare Predictor")
-st.markdown("Enter details to predict total fare.")
+st.markdown("Enter trip details to predict the **total fare**.")
 
 # Input fields
 trip_distance = st.number_input("Trip Distance (miles)", min_value=0.0, format="%.2f")
@@ -36,10 +50,13 @@ input_dict = {
 }
 input_df = pd.DataFrame([input_dict])
 
-# Ensure correct feature order and match
+# Reorder columns to match training
 input_df = input_df.reindex(columns=features_used)
 
 # Predict
 if st.button("Predict Fare"):
-    prediction = model.predict(input_df)[0]
-    st.success(f"Predicted Total Fare: ${prediction:.2f}")
+    try:
+        prediction = model.predict(input_df)[0]
+        st.success(f"Predicted Total Fare: ${prediction:.2f}")
+    except Exception as e:
+        st.error(f"Prediction failed: {e}")
