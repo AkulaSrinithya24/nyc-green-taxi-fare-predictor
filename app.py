@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 import streamlit as st
 
-# Unpack model and feature list from the tuple
+# Load model and expected feature names
 model, features_used = joblib.load('linear_model.pkl')
 
 # UI
@@ -38,8 +38,8 @@ input_dict = {
 # Convert to DataFrame
 input_df = pd.DataFrame([input_dict])
 
-# Reorder columns to match model input
-input_df = input_df.reindex(columns=features_used)
+# Reindex to match training features and fill missing ones with 0
+input_df = input_df.reindex(columns=features_used).fillna(0)
 
 # Predict
 if st.button("Predict Fare"):
