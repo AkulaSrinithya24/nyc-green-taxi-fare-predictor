@@ -2,22 +2,8 @@ import joblib
 import pandas as pd
 import streamlit as st
 
-# Load the model only (not a tuple)
-model = joblib.load('linear_model.pkl')
-
-# Define the features used during model training
-features_used = [
-    'trip_distance',
-    'fare_amount',
-    'extra',
-    'mta_tax',
-    'tip_amount',
-    'tolls_amount',
-    'improvement_surcharge',
-    'congestion_surcharge',
-    'trip_duration',
-    'passenger_count'
-]
+# Unpack model and feature list from the tuple
+model, features_used = joblib.load('linear_model.pkl')
 
 # UI
 st.title("NYC Green Taxi Fare Predictor")
@@ -35,7 +21,7 @@ improvement_surcharge = st.number_input("Improvement Surcharge ($)", min_value=0
 congestion_surcharge = st.number_input("Congestion Surcharge ($)", min_value=0.0, format="%.2f")
 trip_duration = st.number_input("Trip Duration (minutes)", min_value=0.0, format="%.2f")
 
-# Create the input dataframe
+# Create input dictionary
 input_dict = {
     'trip_distance': trip_distance,
     'fare_amount': fare_amount,
@@ -48,9 +34,11 @@ input_dict = {
     'trip_duration': trip_duration,
     'passenger_count': passenger_count
 }
+
+# Convert to DataFrame
 input_df = pd.DataFrame([input_dict])
 
-# Reorder columns to match training
+# Reorder columns to match model input
 input_df = input_df.reindex(columns=features_used)
 
 # Predict
